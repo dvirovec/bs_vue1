@@ -1,0 +1,13 @@
+https://blog.logrocket.com/full-guide-to-using-font-awesome-icons-in-vue-js-apps-5574c74d9b2d/
+
+https://fontawesome.com/how-to-use/on-the-web/using-with/vuejs
+
+
+import { library } from '@fortawesome/fontawesome-svg-core'
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
+import { faCoffee, faPlus, faTrash, faEdit, faSyncAlt, faSortUp } from '@fortawesome/free-solid-svg-icons'
+
+-- all icons should be loaded
+library.add(faPlus, faTrash, faEdit, faSyncAlt, faSortUp, faSortDown)
+
+Vue.component('font-awesome-icon', FontAwesomeIcon)
