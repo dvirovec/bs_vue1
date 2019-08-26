@@ -1,16 +1,16 @@
 <template>
 
   <div style="height: 100%; width: 100%;">
-        <b-navbar class="btn-secondary btn-group" style="padding:2px;padding-left:1px;width:100%;">
+        
+<b-navbar class="btn-secondary btn-group" style="padding:2px;padding-left:1px;width:100%;">
       
-<CrudToolbar :append="appendRow" :remove="deleteRow" :refresh="loadData" :edit="showModal" />  
+<CrudToolbar :append="appendRow" :remove="deleteRow" :refresh="loadData" :edit="showModal"/>  
 
       <b-navbar-nav class="btn-group float-right">
-        <span v-if="row != null" style="padding-left:5px;">{{ row.name }}</span>
+        <span v-if="row != null" style="padding-left:10px;">{{ row.name }}</span>
       </b-navbar-nav>
-      
 
-    </b-navbar>
+</b-navbar>
 
     <ag-grid-vue ref="dataGrid"
       style="width: 100%; height: 1000px;"
@@ -27,134 +27,46 @@
       @cell-focused="onCellFocused"
     ></ag-grid-vue>
 <!-- data form -->
-    <b-modal
-      no-fade
-      size="xl"
-      class="btn-dark"
-      ref="form"
-      title="Company"
-      header-bg-variant="warning"
-      body-bg-variant="warning"
-      footer-bg-variant="warning">
-
-      <template slot="modal-header">
-        <div>Company</div>
-
-        <b-button class="btn btn-primary ml-1 btn-sm float-right" @mouseover="showErrors">
-          <font-awesome-icon @mouseover="showErrors" class="sort-down" icon="exclamation-triangle"></font-awesome-icon>
-        </b-button>
-      </template>
-
-      <template slot="default">
-        <b-container v-if="row!=null" style="font-size:12px;">
-          <b-row>
-            <b-col sm="8">
-              <label for="input-1" class="mb-0">Naziv</label>
-              <b-form-input
-                id="input-1" autofocus v-model="row.name" type="text" required placeholder="Naziv poduzeća">
-                </b-form-input>
-            </b-col>
-
-            <b-col sm="4">
-              <label for="input-2" class="mb-0">OIB</label>
-              <b-form-input id="input-2" v-model="row.cid" type="text" required placeholder="OIB"></b-form-input>
-            </b-col>
-          </b-row>
-
-          <b-row>
-            <b-col sm="5">
-              <label for="input-3" class="mb-0">Adresa</label>
-              <b-form-input
-                id="input-3"
-                v-model="row.address"
-                type="text"
-                required
-                placeholder="Adresa"
-              ></b-form-input>
-            </b-col>
-
-            <b-col sm="3">
-              <ComboBox label="Town" url="/erp/town/" v-model="row.town" />
-            </b-col>
-
-            <b-col>
-              <ComboBox label="Country" code url="/erp/country/" v-model="row.country" />
-            </b-col>
-          </b-row>
-        </b-container>     
-</template>
-
-<template slot="modal-footer">
-
-  <b-button class="btn btn-primary ml-1 btn-sm float-left" @click="selectRow(1)">
-    <font-awesome-icon class="sort-down" icon="caret-down"></font-awesome-icon>
-  </b-button>
-
-  <b-button class="btn btn-primary ml-1 btn-sm float-right" @click="selectRow(-1)">
-    <font-awesome-icon icon="caret-up"></font-awesome-icon>
-  </b-button>
-
-  <b-button variant="secondary" size="sm" class="mr-2" @click="closeCancel">Cancel</b-button>
-  <b-button variant="primary" size="sm" @click="updateAppend">Save/Append</b-button>
-  <b-button variant="primary" size="sm" @click="updateClose">Save</b-button>
-
-</template>
-
-</b-modal>
-
-<b-modal no-fade size="lg" ref="error_form" title="Errors"
-header-bg-variant="default"
-body-bg-variant="default"
-footer-bg-variant="danger">
-  <div slot="modal-header">Errors</div>
-  <div slot="modal-footer" style="display:none;"/>
-</b-modal>
+    
+<CompanyForm :row="row" :update="update" :append="appendRow" 
+          :cancel="closeCancel" :move="selectRow" ref="form"/>
 
 </div>
-
 
 </template>
 
 <script>
 import { AgGridVue } from "ag-grid-vue";
 import axios from "axios";
-import ComboBox from "../components/ComboBox.vue";
 import CrudToolbar from "../components/CrudToolbar.vue";
+import CompanyForm from "../views/CompanyForm.vue"
 
 export default {
   name: "CompanyList",
-  components: { ComboBox, CrudToolbar, AgGridVue },
+  components: {CrudToolbar, AgGridVue, CompanyForm },
   data() {
-    return {
-      api_url: "/erp/company/",
-      rows: [],
-      row: null,
-      id: null,
+    return {      
+      key: "company",            
+      selectedNodes: null,
       columnDefs: null,
       gridOptions: null,
       defaultColDef: null,
       rowData: null,
-      gridApi: null,
-      open: false,
-      errors: false,
+      gridApi: null,            
       lastKey:null,
     };
   },
-  computed: {
+  computed: {    
+    rows() { return this.$store.state.data[this.key].rows; },
+    row() { return this.$store.state.data[this.key].row },
     modal_open() {
       if(this.$refs["form"])
         return this.$refs["form"].isShow;
     }
   },
-  created() {
-   /*  window.addEventListener("keydown", e => {
-      //console.log(e.key);
-
-     
-    });*/
-  },
-
+  created() { },
   methods: {
+
     onCellKeyDown(e) {
        
       this.lastKey = e.event.key;
@@ -179,9 +91,9 @@ export default {
       }
     },
     deleteRow() {
-      this.boxTwo = "";
-      this.$bvModal
-        .msgBoxConfirm("Delete " + this.row.name + " !?", {
+    
+    this.$bvModal
+        .msgBoxConfirm(this.gridApi.getSelectedNodes().length > 1 ? "Delete selected records !?" : "Delete " + this.row.name + " !?", {
           title: "Please Confirm",
           noFade: true,
           size: "sm",
@@ -196,177 +108,96 @@ export default {
         .then(value => {
           if (value) {
 
-            if (this.row.id == null) {
-              this.removeSelectedRowsInGrid();        
-              return;
-            }
+            let rows = this.gridApi.getSelectedNodes();
 
-            if (this.row.id) {
-              axios
-                .delete(this.api_url + this.row.id)
-                .then(result => {         
-                    this.removeSelectedRowsInGrid();
-                })
-                .catch(console.error);
-            }
+            if(this.selectedNodes.rowNodes.length>0)
+                  this.selectedNodes.rowNodes.forEach((e)=>{
+                    rows.push(e);
+                  });
+
+            rows.forEach((e)=>{
+              this.$store.dispatch("deleteRow", {key:this.key, row: e.data });
+            });
           }
         })
         .catch(err => {
           // An error occurred
         });
     },
-    showErrors() {
-      this.$refs["error_form"].show();
-    },
     closeModal() {
-      this.$refs["form"].hide();
+      this.$refs["form"].closeForm();
     },
     showModal() {
-      if(this.$refs["form"] && !this.modal_open)
-          this.$refs["form"].show();
+      if(this.$refs["form"])
+          this.$refs["form"].openForm();
     },
     closeCancel() {
       this.closeModal();
-      this.removeNullRow();
-    },
-    removeNullRow() {
-      if (this.row && this.row.id == null) {
-          var node = this.gridApi.getRowNode(null);
-          node.setSelected(true);
-          this.removeSelectedRowsInGrid();
-          }
     },
     loadData() {
-      axios
-        .get(this.api_url)
-        .then(result => {
-          this.rows = result.data;
-        })
-        .catch(console.error);
+       this.$store.dispatch("loadData", this.key);
     },
-    appendRow() {
-      axios
-        .get(this.api_url + "-1")
-        .then(result => {          
-          this.row = result.data;
-          this.rows.push(this.row);          
-          this.deselectAll();
-          var newItems = [this.row];
-          var res = this.gridApi.updateRowData({ add: newItems });
-
-          res["add"][0].setSelected(true);
-
-          this.showModal();
-        })
-        .catch(console.error);
+    appendRow() {   
+      this.redraw()
+      this.$store.dispatch("newRow",this.key, this.showModal());
+    },
+    onSelectionChanged(e) {
+      if (this.gridApi.getSelectedNodes()) {        
+        if (this.gridApi.getSelectedNodes().length > 0) {                  
+          this.$store.dispatch("selectRow", { key:this.key, row:this.gridApi.getSelectedNodes()[0].data });          
+        }        
+      }
+    },
+     onCellFocused(e) {
+      if(this.lastKey == 'Help') return; 
+      if (this.gridApi && this.gridApi.getDisplayedRowAtIndex(e.rowIndex)) {       
+          this.$store.dispatch("selectRow", { key:this.key, row:this.gridApi.getDisplayedRowAtIndex(e.rowIndex).data });                  
+          this.selectedNodes = { rowNodes: [this.gridApi.getDisplayedRowAtIndex(e.rowIndex)] };
+      }
     },
     updateAppend(){
-      this.update();
+      this.$store.dispatch("updateData", this.key, {row:this.row}, this.appendRow );
       this.appendRow();
     },
     updateClose() {
-      this.update();
+      this.$store.dispatch("updateData", this.key, {row:this.row}, this.redraw() );      
       this.closeModal();
-    },
-    update() {
-      if (this.row.id != null) {
-        axios
-          .put(this.api_url + this.row.id, this.row)
-          .then(result => {
-            var node = this.gridApi.getRowNode(result.data.id);
-            node.setData(result.data);
-            node.setSelected(true);
-          })
-          .catch(console.error);
-      } else {        
-        axios
-          .post(this.api_url, this.row)
-          .then(result => {
-            var node = this.gridApi.getRowNode(null);
-            node.setSelected(true);
-            this.row.id = result.data.id;
-            node.setData(result.data);
-          })
-          .catch(console.error);
+   },    
+   update(mode) {
+      switch(mode) {
+        case 'append': this.updateAppend();break;
+        case 'close': this.updateClose();break;
       }
+   },
+    redraw() {
+        this.gridApi.redrawRows(this.selectedNodes);
     },
     deselectAll() {
-      var nodes = this.gridApi.getSelectedNodes();
-      nodes.forEach(node => {
+      this.gridApi.getSelectedNodes().forEach(node => {
             node.setSelected(false);
         });
     },
-    removeSelectedRowsInGrid() {
-      var rows = this.gridApi.getSelectedRows();
-      var result = this.gridApi.updateRowData({ remove: rows });
-
-      var null_row = this.rows.filter(e=>e.id==null);
-
-        null_row.forEach(row => {
-            this.rows.pop(row);
-        });
-
-    },
-
-    selectRow(n) {
-      //  console.log(this.$refs["form"].isShow);
-
-      if (!this.modal_open) return;
-
+    selectRow(n) {            
       const cell = this.gridApi.getFocusedCell();
-
       if (cell) {
         const x = cell.rowIndex + n;
         if (x >= 0 && x < this.gridApi.getDisplayedRowCount())
           this.gridApi.setFocusedCell(x, cell.key, null);
       }
     },
-    onSelectionChanged(e) {
-      if (this.gridApi.getSelectedNodes()) {        
-        if (this.gridApi.getSelectedNodes().length > 0) {
-          this.id = this.gridApi.getSelectedNodes()[0].id;
-          this.row = this.gridApi.getSelectedNodes()[0].data;
-        }
-        //this.$store.dispatch("selectCompany", this.gridApi.getSelectedNodes()[0]);
-        //this.$store.state.id = this.gridApi.getSelectedNodes()[0].id;
-        //this.$store.commit("selectCompany",this.gridApi.getSelectedNodes()[0].data);
-      }
-    },
-    onCellFocused(e) {
-
-      if(this.lastKey == 'Help') return;
-      
-      if (this.gridApi && this.gridApi.getDisplayedRowAtIndex(e.rowIndex)) {        
-        this.row = this.gridApi.getDisplayedRowAtIndex(e.rowIndex).data;
-      }
-      
-    },
     gridReady(params) {
       this.gridApi = params.api;
       this.gridColumnApi = params.columnApi;
-
-      /*  if (this.$store.state.id) {
-        let snode = this.gridApi.getRowNode(this.$store.state.id);
-        if (snode) snode.setSelected(true);
-      }*/
-
       this.gridApi.sizeColumnsToFit();
     }
   },
-  mounted() {
-    this.$root.$on('bv::modal::hide', (bvEvent, modalId) => {
-      this.removeNullRow();      
-    })
-
-  },
+  mounted() {},
   refresh() {},
 
   beforeMount() {
 
     document.title = "Company";
-
-    this.loadData();
-
+    
     this.gridOptions = {
       getRowNodeId: function(data) {
         return data.id;
@@ -410,6 +241,8 @@ export default {
         suppressSizeToFit: false
       }
     ];
+
+    this.loadData();
   }
 };
 </script>

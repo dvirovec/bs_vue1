@@ -1,27 +1,15 @@
 <template>
 
   <div style="height: 100%; width: 100%;">
-       <b-navbar class="btn-secondary btn-group" style="padding:2px;padding-left:1px;width:100%;">
-      <b-navbar-nav class="float-left">
-        <b-button class="btn btn-dark ml-1 btn-sm" @click="appendRow" v-b-tooltip.hover title="Append">
-          <font-awesome-icon style="color:orange;" class="fa-sm" icon="plus"></font-awesome-icon> Ins
-        </b-button>
+  
+  <b-navbar class="btn-secondary btn-group" style="padding:2px;padding-left:1px;width:100%;">
 
-        <b-button class="btn btn-dark ml-1 btn-sm" @click="deleteRow" v-b-tooltip.hover title="Delete">
-          <font-awesome-icon style="color:orange;" class="fa-sm" icon="trash"></font-awesome-icon> Del
-        </b-button>
-
-        <b-button class="btn btn-dark ml-1 btn-sm" @click="showModal" v-b-tooltip.hover title="Edit">
-          <font-awesome-icon style="color:orange;" class="fa-sm" icon="edit"></font-awesome-icon> F2
-        </b-button>
-        <b-button class="btn btn-dark ml-1 btn-sm" @click="loadData" v-b-tooltip.hover title="Refresh">
-          <font-awesome-icon style="color:orange;" class="fa-sm" icon="sync-alt"></font-awesome-icon> F5
-        </b-button>
-      </b-navbar-nav>
+  <CrudToolbar :append="appendRow" :remove="deleteRow" :refresh="loadData" :edit="showModal" /> 
 
       <b-navbar-nav class="btn-group float-right">
-        <span v-if="row != null" style="padding:5px;">{{ row.name }}</span>
+        <span v-if="row != null" style="padding-left:5px;">{{ row.name }}</span>
       </b-navbar-nav>
+
     </b-navbar>
 
     <ag-grid-vue
@@ -113,10 +101,11 @@ footer-bg-variant="danger">
 import { AgGridVue } from "ag-grid-vue";
 import axios from "axios";
 import ComboBox from "../components/ComboBox.vue";
+import CrudToolbar from "../components/CrudToolbar.vue"
 
 export default {
   name: "TownList",
-  components: { ComboBox, AgGridVue },
+  components: { ComboBox, AgGridVue, CrudToolbar },
   data() {
     return {
       api_url: "/erp/town/",

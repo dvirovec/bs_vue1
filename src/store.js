@@ -7,57 +7,35 @@ Vue.use(Vuex);
 export default new Vuex.Store({
 
 state: {
-    company:null,
-    companies: [],
     profile: null,
-    company_url: '/erp/company/'
+    data: {
+        company: {url:'/erp/company/', rows:[], row: null },
+        town: {url:'/erp/town/', rows:[], row: null },
+        country: {url:'/erp/country/', rows:[], row: null },
+        currency: {url:'/erp/currency/', rows:[], row: null }
+    }
 },
 mutations: {
-    updateCompanies(state, companies) {
-      state.companies = [];
-      companies.forEach((element) => {
-        this.state.companies.push(element);        
-        //state.comp_selection.push({ value: element.id, text: element.name });
-      });
-      if(state.companies.length>0)
-        this.state.comapny = state.companies[0];      
-    },
-    updateSelectedCompany(state, company) {
-      if(company)
-        state.company = state.companies.filter(e => e.id === company.id);      
-    },
-//-----------------------db
-append(state) {
-  axios.get(state.company_url+'-1')
-  .then((result) => {
-    state.companies.push(result);
-    state.company = result;})
-    .catch(console.error);
-},
-update(state) {
-  if (this.state.company.id) {
-    axios.put(this.state.company_url+state.company.id, state.company)
-      .then(console.log('Saved update...')).catch(console.error);
-  } else {
-    axios.post(this.company_url, state.company)
-      .then((result) => {
-        state.company.id = result.data.id;
-      }).catch(console.error);
-  }
-},
-delete(state) {
-  if (state.company.id) {
-    axios.delete(this.state.company_url+state.company.id)
-      .then((result) => {
-        const i = state.companies.findIndex(e => e.id === result.data.id);
-        state.companies.splice(i, 1);
-
-        if ((state.companies.length - 1) >= i) state.i = i;
-        else state.i = state.companies.length - 1;
-      })
-      .catch(console.error);
-  }
-},
+   setRows(state, params) {
+      state.data[params.key].rows = params.rows;            
+   },
+   delRow(state, params) {
+    let rowIndex =  state.data[params.key].rows.findIndex((e)=>e.id === params.id);
+    if(rowIndex!=-1) state.data[params.key].rows.splice(rowIndex,1);
+   }, 
+   updateRow(state, params) {     
+    let i =  state.data[params.key].rows.findIndex((e)=>e.id === params.row.id);
+    console.log(i);
+    if(i!=-1) {
+        state.data[params.key].rows[i] = params.row;
+      }
+    else {
+        state.data[params.key].rows.push(params.row);
+      }    
+   },
+   setSelectedRow(state, params) {
+      state.data[params.key].row = params.row;
+   },
     setUserData(state, userData)  {
         state.profile = userData;
         axios.get('erp/user_detail/'+userData.id)
@@ -66,22 +44,63 @@ delete(state) {
     }
 },
 actions: {
-
   login({commit}, username, password ) {
     axios.get('/erp/login/'+username+'/'+password)
-        .then(result=>commit('setUserData', result.data))
+        .then(           
+          result=>{commit('setUserData', result.data) })
         .catch(console.error);
   },
-    getCompanies({commit}) {
-        axios.get(this.state.company_url)
-        .then(result=>{commit('updateCompanies', result.data)})
+    loadData({commit}, key) {
+       let url = this.state.data[key].url;
+        axios.get(url)
+        .then(result=>{ commit('setRows',{ key: key, rows: result.data }) })
         .catch(console.error);
     },
-    selectCompany({commit}, company) {
-      commit('updateSelectedCompany', company)
+    newRow({commit}, key, method) {
+      let url = this.state.data[key].url+"-1";
+      axios
+        .get(url)
+        .then(result => {           
+          commit('setSelectedRow', {key:key, row:result.data});
+          if(method) method();
+        })
+        .catch(console.error);
+    },
+    updateData({commit}, key, method) {
+      let url = this.state.data[key].url;      
+      if (this.state.data[key].row.id != null) {
+        url+=this.state.data[key].row.id;
+        axios
+          .put(url, this.state.data[key].row)
+          .then(result => {          
+              commit("updateRow", { key:key, row:result.data });
+              if(method) method();
+          })
+          .catch(console.error);
+      } else {                
+        axios
+          .post(url, this.state.data[key].row)
+          .then(result => {
+            commit("updateRow", { key:key, row:result.data });
+            if(method) method();
+          })
+          .catch(console.error);
+      }
+    },
+    selectRow({commit}, data) {
+      commit("setSelectedRow", data);
+    },
+    deleteRow({commit}, params) {
+      let url = this.state.data[params.key].url+params.row.id;  
+      if (params.row.id) {
+        axios
+          .delete(url)
+          .then(result => {         
+              commit("delRow", {key:params.key, id:params.row.id });
+          })
+          .catch(console.error);
+      }
     }
 
-
 },
-
 });

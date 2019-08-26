@@ -27,9 +27,8 @@
     ></ag-grid-vue>
 
 <!-- data form -->
-<CurrencyForm :row="row" :update="update" :append="appendRow" :cancel="closeCancel" :move="selectRow" ref="form"/>
-
-
+<CurrencyForm :row="row" :update="update" :append="appendRow" 
+          :cancel="closeCancel" :move="selectRow" ref="form"/>
 
 </div>
 
@@ -116,8 +115,6 @@ export default {
             var nodes = this.gridApi.getSelectedNodes();  
 
             nodes.forEach((node)=>{
-
-console.log(node);
               
               if(node.id==null) {
                this.gridApi.updateRowData({ remove: [node] });
@@ -144,7 +141,7 @@ console.log(node);
 
     },   
     showModal() {
-      if(this.$refs["form"] && !this.modal_open)
+      if(this.$refs["form"])
           this.$refs["form"].openForm();
     },
     closeCancel() {      
