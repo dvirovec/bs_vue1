@@ -58,6 +58,10 @@
 
 
 <script>
+
+
+
+
 export default {
     name:'MainPage',
    
@@ -67,3 +71,18 @@ export default {
     },
 }
 </script>
+
+<style>
+
+    .modal-header {
+      padding:.5rem;
+    }
+    .modal-footer {
+      padding:.5rem;
+    }
+
+    .modal-body {
+      padding-left:.5rem;
+    }
+
+</style>

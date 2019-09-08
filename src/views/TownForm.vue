@@ -71,40 +71,26 @@ footer-bg-variant="danger">
 </template>
 <script>
 
-import ComboBox from "../components/ComboBox.vue";
+import BaseInputForm from "../views/BaseInputForm.vue"
 
 export default {
     name:"TownForm",
-    components: { ComboBox },
-    props: ['row', 'move', 'update','cancel', 'append'],
-    methods: {
-            openForm(){
-               this.$refs["form"].show();     
-            },
-            closeForm(){
-               this.$refs["form"].hide();     
-            },
-            showErrors() {
-               this.$refs["error_form"].show();
-            },
-            closeCancel() {
-                this.cancel();                
-            },
-            updateAppend() {
-                this.update("append");                
-            },
-            updateClose() {                                
-                this.update("close");
-            },
-            selectRow(i) {
-               this.move(i); 
-            }
-    },
+    extends: BaseInputForm,
     data() {
-            return {
+      return { errors:[]
 
-            }
-        },
-    mount: { }    
+      };
+    },
+    methods: {
+        validate() {
+          if(row.name.length==0)
+               alert("Ime ne može biti prazno !");
+
+            console.log("main form ...");
+            console.log(this.row);
+            return true;
+        }
+
+    }
 }
 </script>

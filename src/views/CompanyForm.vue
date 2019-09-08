@@ -85,40 +85,11 @@
 </template>
 <script>
 
-import ComboBox from "../components/ComboBox.vue";
+import BaseInputForm from "../views/BaseInputForm.vue"
 
 export default {
     name:"CompanyForm",
-    components: { ComboBox },
-    props: ['row', 'move', 'update','cancel', 'append'],
-    methods: {
-            openForm(){
-               this.$refs["form"].show();     
-            },
-            closeForm(){
-               this.$refs["form"].hide();     
-            },
-            showErrors() {
-               this.$refs["error_form"].show();
-            },
-            closeCancel() {
-                this.cancel();                
-            },
-            updateAppend() {
-                this.update("append");                
-            },
-            updateClose() {                                
-                this.update("close");
-            },
-            selectRow(i) {
-               this.move(i); 
-            }
-    },
-    data() {
-            return {
-
-            }
-        },
-    mount: { }    
-}
+    extends:BaseInputForm
+    }
+    
 </script>

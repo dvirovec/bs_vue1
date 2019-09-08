@@ -45,7 +45,14 @@
         </b-container>     
 </template>
 
-<template slot="modal-footer">
+<template v-if="errors.length>0" slot="modal-footer" style="justify-content:left!important;">
+    <b-table-lite striped hover sticky-header="true" small
+    head-variant="dark"
+    responsive borderless style="font-size:12px;" :items="errors"></b-table-lite>  
+    </template>
+
+
+<template v-else slot="modal-footer">
 
   <b-button class="btn btn-primary ml-1 btn-sm float-left" @click="selectRow(1)">
     <font-awesome-icon class="sort-down" icon="caret-down"></font-awesome-icon>
@@ -59,7 +66,7 @@
   <b-button variant="primary" size="sm" @click="updateAppend">Save/Append</b-button>
   <b-button variant="primary" size="sm" @click="updateClose">Save</b-button>
 
-<b-modal no-fade size="lg" ref="error_form" title="Errors"
+<b-modal no-fade size="lg" ref="error_form" title="Errors" 
 header-bg-variant="default"
 body-bg-variant="default"
 footer-bg-variant="danger">
@@ -75,41 +82,11 @@ footer-bg-variant="danger">
 </template>
 <script>
 
-import ComboBox from "../components/ComboBox.vue";
+import BaseInputForm from "../views/BaseInputForm.vue"
 
 export default {    
     name:"CountryForm",
-    components: { ComboBox },
-    props: ['row', 'move', 'update','cancel', 'append'],
-    methods: {
-            openForm(){
-               this.$refs["form"].show();     
-            },
-            closeForm(){
-               this.$refs["form"].hide();     
-            },
-            showErrors() {
-               this.$refs["error_form"].show();
-            },
-            closeCancel() {
-                this.cancel();                
-            },
-            updateAppend() {
-                this.update("append");                
-            },
-            updateClose() {                                
-                this.update("close");
-            },
-            selectRow(i) {
-               this.move(i); 
-            }
-    },
-    data() {
-            return {
-
-            }
-        },
-    mount: { }    
+    extends:BaseInputForm,
 }
 </script>
 
