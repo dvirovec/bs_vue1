@@ -7,8 +7,11 @@
       footer-bg-variant="warning">
 
       <template slot="modal-header">
-        <div class="ml-2">Country</div>       
-          <font-awesome-icon @mousedown="validate" class="sort-down" icon="exclamation-triangle"></font-awesome-icon>       
+        <div class="ml-2">Country</div>     
+        <div>  
+          <font-awesome-icon v-show="hasErrors" @mousedown="validate"  class="sort-down mr-2" icon="exclamation-triangle"></font-awesome-icon>   
+          <font-awesome-icon  @mousedown="closeCancel" class="sort-down" icon="window-close"></font-awesome-icon>     
+      </div>
       </template>
 
       <template slot="default">
@@ -41,25 +44,32 @@
 
 </template>
   
-    <template v-if="hasErrors" slot="modal-footer" style="justify-content:left!important;">
-      <ErrorGrid ref="errorGrid" />
-    </template>
+<template slot="modal-footer">
 
-<template v-else slot="modal-footer">
-  
-  <b-button class="btn btn-primary ml-1 mr-1 btn-sm float-left" @click="selectRow(1)">
+<b-container>
+
+<b-row v-show="!hasErrors">
+
+  <b-button class="btn btn-primary ml-1 mr-1 btn-sm" @click="selectRow(1)">
     <font-awesome-icon class="sort-down" icon="caret-down"></font-awesome-icon>
   </b-button>
 
-  <b-button class="btn btn-primary mr-1 btn-sm float-right" @click="selectRow(-1)">
+  <b-button class="btn btn-primary mr-1 btn-sm" @click="selectRow(-1)">
     <font-awesome-icon icon="caret-up"></font-awesome-icon>
   </b-button>
 
   <b-button variant="secondary" size="sm" class="mr-1" @click="closeCancel">Cancel</b-button>
   <b-button variant="primary" size="sm" class="mr-1" @click="updateAppend">Save/Append</b-button>
   <b-button variant="primary" size="sm" class="mr-1" @click="updateClose">Save</b-button>
-  
-  
+
+</b-row>
+
+<b-row v-show="hasErrors">  
+  <ErrorGrid  ref="errorGrid" />
+</b-row>
+
+</b-container>
+
 </template>
 
 </b-modal>
@@ -76,7 +86,7 @@ export default {
     extends:BaseInputForm,    
     data() {
         return {
-            hasErrors: false
+            hasErrors:false,
         };
     },
     created() {
@@ -91,11 +101,10 @@ export default {
     methods: {
       
         validate() {
-          
-          if(this.$refs.errorGrid==undefined)
-                  this.$refs.errorGrid = new ErrorGridClass();
 
-          this.$refs.errorGrid.clearErrors();
+          if(!this.$refs.errorGrid) return true;
+
+            this.$refs.errorGrid.clearErrors();
 
             if(vEmpty(this.row.name)) this.$refs.errorGrid.addError("Currency name can't be empty or number.");          
             
@@ -103,9 +112,10 @@ export default {
             
             if(vNumber(this.row.num)) this.$refs.errorGrid.addError("Currency number can't be empty.");          
             
-            this.hasErrors = this.$refs.errorGrid.errors.length != 0;
+            this.hasErrors = (this.$refs.errorGrid.errors.length > 0) 
 
             return !this.hasErrors;
+
 
         }
     }

@@ -1,9 +1,9 @@
 <template>
 
-<div style="width:100%;" v-if="errors.length>0">
+<div style="width:100%;margin-top:3px;" v-if="errors.length>0">
     <b-table sticky-header striped hover small
     head-variant="dark"
-    responsive borderless style="font-size:.8em;height:80px;" :items="errors"></b-table>  
+    responsive borderless style="font-size:.8em;height:80px;" :items="errors" :fields="fields"></b-table>  
   </div>    
 
 </template>
@@ -14,6 +14,7 @@ export default {
     name:"ErrorGrid",
     data() {
         return {
+            fields:['errors'],
             errors: [],
         }
     },

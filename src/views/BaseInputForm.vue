@@ -4,8 +4,8 @@
 <script>
 
 import ComboBox from "../components/ComboBox.vue";
-import ErrorGrid from "../components/ErrorGrid.vue"
-import Vue from 'vue'
+import ErrorGrid from "../components/ErrorGrid.vue";
+import Vue from 'vue';
 
 
 
@@ -45,7 +45,6 @@ export default {
     },
     data() {
             return {
-                ErrorGridClass:Vue.extend(ErrorGrid);
                 errors: [],    
             }
         },

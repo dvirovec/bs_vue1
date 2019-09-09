@@ -8,14 +8,14 @@ import 'vue-select/dist/vue-select.css';
 
 import { library } from '@fortawesome/fontawesome-svg-core'
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome'
-import { faCoffee, faPlus, faTrash, faEdit, faSyncAlt, faSortUp, faSortDown, faCaretDown, faCaretUp, faExclamationTriangle } from '@fortawesome/free-solid-svg-icons'
+import { faPlus, faTrash, faEdit, faSyncAlt, faSortUp, faSortDown, faCaretDown, faCaretUp, faExclamationTriangle, faWindowClose } from '@fortawesome/free-solid-svg-icons'
 
 import store from './store';
 import router from './router';
 
 import App from './App.vue'
 
-library.add(faPlus, faTrash, faEdit, faSyncAlt, faCaretDown, faCaretUp, faExclamationTriangle)
+library.add(faPlus, faTrash, faEdit, faSyncAlt, faCaretDown, faCaretUp, faExclamationTriangle, faWindowClose)
 
 Vue.config.productionTip = false
 
