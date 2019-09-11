@@ -79,16 +79,11 @@
 <script>
 
 import BaseInputForm from "../views/BaseInputForm.vue"
-import { vEmpty, vNumber } from "../components/ValidHelpers"
+import { vEmpty, vNumber, vIsLength } from "../components/ValidHelpers"
 
 export default {
     name:"CurrencyForm",
-    extends:BaseInputForm,    
-    data() {
-        return {
-            hasErrors:false,
-        };
-    },
+    extends:BaseInputForm,
     created() {
     
     },
@@ -110,8 +105,12 @@ export default {
             
             if(vEmpty(this.row.code)) this.$refs.errorGrid.addError("Currency code can't be empty or number.");          
             
+            if(!vIsLength(this.row.code,3)) this.$refs.errorGrid.addError("Currency code must be 3 characters long.");          
+             
             if(vNumber(this.row.num)) this.$refs.errorGrid.addError("Currency number can't be empty.");          
-            
+
+            if(!vIsLength(String(this.row.num),3)) this.$refs.errorGrid.addError("Currency number must be 3 digits long.");          
+           
             this.hasErrors = (this.$refs.errorGrid.errors.length > 0) 
 
             return !this.hasErrors;

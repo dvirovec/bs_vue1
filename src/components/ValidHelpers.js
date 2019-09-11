@@ -6,3 +6,7 @@ export function vEmpty(value) {
 export function vNumber(value) {
     return !(value && !isNaN(value));
 }
+
+export function vIsLength(value, length) {
+    return value.length == length; 
+}
